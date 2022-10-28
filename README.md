@@ -8,4 +8,4 @@ This Alexa Skill will play Audio OR Video based on the device the user is access
 
 1# DISPLAY AUDIO/VIDEO
 
-3# DUSPLAY GOODBYE AUDIO MESSAGE
+3# DISPLAY GOODBYE AUDIO MESSAGE
