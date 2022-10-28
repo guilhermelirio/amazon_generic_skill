@@ -1,7 +1,5 @@
 const Alexa = require('ask-sdk-core');
 const VIDEO_URL = 'https://bmw-ix3.s3.amazonaws.com/videos/audio1.mp4';
-const VIDEO_TITLE = 'Test';
-const VIDEO_SUBTITLE = 'Subtitle'
 const AUDIO_URL = 'https://bmw-ix3.s3.amazonaws.com/audios/audio1.mp3';
 
 //Verify Display
@@ -11,7 +9,7 @@ function supportsDisplay(handlerInput) {
         handlerInput.requestEnvelope.context.System &&
         handlerInput.requestEnvelope.context.System.device &&
         handlerInput.requestEnvelope.context.System.device.supportedInterfaces &&
-        handlerInput.requestEnvelope.context.System.device.supportedInterfaces.VideoApp;
+        handlerInput.requestEnvelope.context.System.device.supportedInterfaces['Alexa.Presentation.APL'];
     return hasDisplay;
 }
 
@@ -22,22 +20,94 @@ const LaunchRequestHandler = {
     handle(handlerInput) {
 
         if (supportsDisplay(handlerInput)) {
-            console.log('31 => Tem suporte à vídeo');
+            console.log('31 => Tem suporte à APL');
 
             handlerInput.responseBuilder
-                .addVideoAppLaunchDirective(VIDEO_URL, VIDEO_TITLE, VIDEO_SUBTITLE)
-                .withShouldEndSession(true);
-                
+                .addDirective({
+                    type: "Alexa.Presentation.APL.RenderDocument",
+                    version: '1.1',
+                    token: "HELLO_WORLD_TOKEN",
+                    document: {
+                        "type": "APL",
+                        "version": "2022.1",
+                        "import": [
+                            {
+                                "name": "alexa-viewport-profiles",
+                                "version": "1.2.0"
+                            }
+                        ],
+                        "onMount": [],
+                        "mainTemplate": {
+                            "parameters": [
+                                "imageData"
+                            ],
+                            "item": [
+                                {
+                                    "type": "Container",
+                                    "id": "cardSpeakContainer",
+                                    "width": "100%",
+                                    "height": "100%",
+                                    "speech": "${imageData.properties.preambleSpeech}",
+                                    "items": [
+                                        {
+                                            "type": "Container",
+                                            "direction": "row",
+                                            "width": "100%",
+                                            "height": "100%",
+                                            "alignItems": "center",
+                                            "data": "${imageData.properties}",
+                                            "items": [
+                                                {
+                                                    "type": "Video",
+                                                    "id": "videoPlayer",
+                                                    "width": "100%",
+                                                    "height": "100%",
+                                                    "autoplay": true,
+                                                    "source": "${data.video_url}",
+                                                    "audioTrack": "foreground",
+                                                    "scale": "best-fill",
+                                                    "onEnd": [
+                                                        {
+                                                            "type": "SpeakItem",
+                                                            "componentId": "cardSpeakContainer"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    datasources: {
+                        "imageData": {
+                            "type": "object",
+                            "properties": {
+                                "speechText": "<speak>Até mais!</speak>",
+                                "video_url": VIDEO_URL
+                            },
+                            "transformers": [
+                                {
+                                    "inputPath": "speechText",
+                                    "outputName": "preambleSpeech",
+                                    "transformer": "ssmlToSpeech"
+                                }
+                            ]
+                        }
+                    }
+                }).speak(`Olá, seja bem vindo!`).withShouldEndSession(true)
+
         } else {
-            console.log('37 => Tem suporte à áudio');
-            
+            console.log('102 => Tem suporte apenas à áudio');
+
             handlerInput.responseBuilder
-                .speak(`<audio src="${AUDIO_URL}" />`)
-                .withShouldEndSession(true);
+                .speak(`Olá, seja bem-vindo! <break time="1s"/> <audio src="${AUDIO_URL}" /> <break time="1s"/> Até mais!`)
+                .withShouldEndSession(true)
         }
-        
+
         return handlerInput.responseBuilder.getResponse();
-        
+
     }
 };
 
