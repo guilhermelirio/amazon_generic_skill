@@ -1,3 +1,9 @@
+// 1.0 by Guilherme Lirio
+//
+// all audios and videos must be converted to Alexa format before posting it to AWS
+// files in AWS must be given public permission before using it here
+// https://developer.amazon.com/en-US/docs/alexa/custom-skills/speech-synthesis-markup-language-ssml-reference.html
+
 const Alexa = require('ask-sdk-core');
 const VIDEO_URL = 'https://bmw-ix3.s3.amazonaws.com/videos/audio1.mp4';
 const VIDEO_TITLE = 'Test';
